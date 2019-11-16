@@ -20,6 +20,8 @@
 #include <aws/text-to-speech/windows/WaveOutPCMOutputDriver.h>
 #elif PULSE
 #include <aws/text-to-speech/linux/PulseAudioPCMOutputDriver.h>
+#elif ALSA
+#include <aws/text-to-speech/linux/AlsaPCMOutputDriver.h>
 #elif CORE_AUDIO
 #include <aws/text-to-speech/apple/CoreAudioPCMOutputDriver.h>
 #endif
@@ -44,6 +46,9 @@ namespace Aws
 #elif PULSE
                 AWS_LOGSTREAM_INFO(CLASS_TAG, "Adding PulseAudio Audio Driver.");
                 drivers.push_back(Aws::MakeShared<PulseAudioPCMOutputDriver>(CLASS_TAG));
+#elif ALSA
+                AWS_LOGSTREAM_INFO(CLASS_TAG, "Adding aLSA Audio Driver.");
+                drivers.push_back(Aws::MakeShared<AlsaPCMOutputDriver>(CLASS_TAG));
 #elif CORE_AUDIO
                 AWS_LOGSTREAM_INFO(CLASS_TAG, "Adding CoreAudio Audio Driver.");
                 drivers.push_back(Aws::MakeShared<CoreAudioPCMOutputDriver>(CLASS_TAG));

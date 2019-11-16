@@ -10,7 +10,7 @@ file( GLOB TEXT_TO_SPEECH_HEADERS "include/aws/text-to-speech/*.h" )
 set(PLATFORM_LIBS "")
 
 check_include_files("pulse/simple.h" HAVE_PULSE)
-
+check_include_files("alsa/asoundlib.h" HAVE_ALSA)
 if(PLATFORM_WINDOWS)
     file( GLOB TEXT_TO_SPEECH_PLATFORM_HEADERS "include/aws/text-to-speech/windows/*.h" )
 	file( GLOB TEXT_TO_SPEECH_PLATFORM_SOURCE "source/text-to-speech/windows/*.cpp" )
@@ -27,6 +27,15 @@ if (PLATFORM_LINUX)
         message(STATUS "Pulse audio header files have been detected, included pulse audio as a possible sound driver implementation.")
         add_definitions("-DPULSE")
         set(PLATFORM_LIBS ${PLATFORM_LIBS} pulse pulse-simple)
+    elseif(HAVE_ALSA)
+        file( GLOB TEXT_TO_SPEECH_PLATFORM_HEADERS "include/aws/text-to-speech/linux/AlsaPCMOutputDriver.h" )
+        file( GLOB TEXT_TO_SPEECH_PLATFORM_SOURCE "source/text-to-speech/linux/AlsaPCMOutputDriver.cpp" )
+
+        message(STATUS "Alsa header files have been detected, included alsa as a possible sound driver implementation.")
+        include_directories(${ALSA_INCLUDE_DIR})
+        link_directories(${ALSA_LIBRARY})
+        add_definitions("-DALSA")
+        set(PLATFORM_LIBS ${PLATFORM_LIBS} asound)
     else()
         message(WARNING "We've detected that you are building on linux, but the header files for pulseaudio are not available.\
                 If you are providing your own audio implementation or you will not be using the text-to-speech library, this is fine.\
@@ -44,6 +53,7 @@ if(PLATFORM_APPLE)
             message(STATUS "Pulse audio header files have been detected, included pulse audio as a possible sound driver implementation.")
             add_definitions("-DPULSE")
             set(PLATFORM_LIBS ${PLATFORM_LIBS} pulse pulse-simple)
+
         else()
             message(FATAL "We've detected that you are building on macos, but there is no coreAudio library and pulseAudio library available.\
                     If you are providing your own audio implementation or you will not be using the text-to-speech library, this is fine.\
